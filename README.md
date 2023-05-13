@@ -10,16 +10,16 @@ To compile `jed`, simply compile main.c using your favourite compiler, you don't
 
 ## Commands
 ```
-i -- insert
-a -- append
-r -- replace
+i -- insert mode
+a -- append mode
+r -- replace mode
 l -- line utils
 b -- buffer utils
 p -- print utils
 w -- write utils
 ```
 ## Insert mode
-By default, you start at the start of current buffer
+By default, you start at the start of current buffer<br>
 To exit insert mode, the current line where you type must contain only `.`, if you need it there, simply escape it using `\.`
 
 however, you can use subcommands:
@@ -27,7 +27,7 @@ however, you can use subcommands:
 * `p` -- `i p 20` will start inserting before 20th character
 > Subcommands can be chained together, like `i l 2 p 10` -- this will start insert mode at line 2, 10th character
 ## Append mode
-By default, you start at the end of current buffer
+By default, you start at the end of current buffer<br>
 To exit append mode, the current line where you type must contain only `.`, if you need it there, simply escape it using `\.`
 
 however, you can use subcommands:
@@ -35,7 +35,7 @@ however, you can use subcommands:
 * `p` -- `i p 20` will start appending after 20th character
 > Subcommands can be chained together, like `a l 2 p 10` -- this will start append mode at line 2, 10th character
 ## Replace mode
-Replace mode by default searches for first occurence from the start of the buffer and replaces it with the new one
+Replace mode by default searches for first occurence from the start of the buffer and replaces it with the new one<br>
 Replace mode's syntax is following `r [subcmds] foo bar`, this will replace first `foo` with `bar`
 
 to improve usage, you can use these subcommands:
@@ -45,7 +45,7 @@ to improve usage, you can use these subcommands:
 
 > Subcommands can be together, like `r g i foo bar` -- this will find occurence of `foo` and it will every time start interactive mode if you want to replace it with `bar`
 ## Line utils
-Line utils help you with managing lines in current buffer, with it you can remove, insert, add, wipe line in simple command
+Line utils help you with managing lines in current buffer, with it you can remove, insert, add, wipe line in simple command<br>
 Syntax example looks like `l (line) [subcmds]` will run action on line `(line)`
 
 Subcommands:
@@ -56,7 +56,7 @@ Subcommands:
 
 > Subcommands cannot be chained!
 ## Buffer utils
-Buffer utils help you with editing the entire buffer
+Buffer utils help you with editing the entire buffer<br>
 Syntax example looks like `b [subcmds]` will run action on the entire buffer
 
 Subcommands:
@@ -67,7 +67,7 @@ Subcommands:
 
 > Subcommands cannot be chained!
 ## Print utils
-Want to know how the current buffer looks like? print utils are just for that!
+Want to know how the current buffer looks like? print utils are just for that!<br>
 Syntax example looks like `p [subcmds]` will print buffer to the sceen based on action
 By default `p` will just print out the entire buffer
 
@@ -77,7 +77,7 @@ Subcommands:
 
 > Subcommands can be chained
 ## Write utils
-You also want to store your buffer somewhere right?
+You also want to store your buffer somewhere right?<br>
 Syntax example looks like `w (file) [subcmds]` will write your buffer into `(file)`
 
 Subcommands:
@@ -85,4 +85,3 @@ Subcommands:
 * `i` -- `w file i` will insert buffer at the start of `file`
 
 > Subcommands cannot be chained!
-
