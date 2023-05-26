@@ -69,7 +69,8 @@ Buffer *insertBefore(Buffer *b, int line) {
     b->lineCount++;
 
     Buffer *new = malloc(sizeof(Buffer));
-    new->text = "";
+    new->text = malloc(1);
+    new->text[0] = 0;
 
     if (line == 1) {
         new->lineCount = b->lineCount;
@@ -88,6 +89,31 @@ Buffer *insertBefore(Buffer *b, int line) {
 
     prev->next = new;
     new->next = copy;
+
+    return b;
+}
+
+Buffer *insertAfter(Buffer *b, int line) {
+    if (b->lineCount < line) return b;
+    if (line <= 0) return b;
+    b->lineCount++;
+
+    Buffer *new = malloc(sizeof(Buffer));
+    new->text = "";
+
+    if (line == 1) {
+        new->next = b->next;
+        b->next = new;
+        return b;
+    }
+
+    Buffer *copy = b;
+    for (int i = 1; i < line; i++) {
+        copy = copy->next;
+    }
+
+    new->next = copy->next;
+    copy->next = new;
 
     return b;
 }
