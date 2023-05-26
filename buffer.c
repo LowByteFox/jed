@@ -8,6 +8,7 @@
 #include <string.h>
 
 typedef struct Node {
+    int lineCount;
     char *text;
     struct Node *next;
 } Buffer;
@@ -38,6 +39,7 @@ Buffer *loadFile(char *name) {
     char tmp;
     char *buff = malloc(1);
     int len = 1;
+    int count = 0;
 
     while ((tmp = fgetc(f)) != EOF) {
         if (tmp != '\n') {
@@ -52,11 +54,13 @@ Buffer *loadFile(char *name) {
             Buffer *next = malloc(sizeof(Buffer));
             buf->next = next;
             buf = buf->next;
+            count++;
         }
     }
 
     buf->next = NULL;
     buf->text = NULL;
+    orig->lineCount = count;
     fclose(f);
     return orig;
 }
