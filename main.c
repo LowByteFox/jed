@@ -63,9 +63,37 @@ Buffer *removeLine(Buffer *b, int line) {
     return b;
 }
 
+Buffer *insertBefore(Buffer *b, int line) {
+    if (b->lineCount < line) return b;
+    if (line <= 0) return b;
+    b->lineCount++;
+
+    Buffer *new = malloc(sizeof(Buffer));
+    new->text = "";
+
+    if (line == 1) {
+        new->lineCount = b->lineCount;
+        new->next = b;
+        return new;
+    }
+
+    Buffer *copy = b;
+    Buffer *prev = b;
+    for (int i = 1; i < line; i++) {
+        copy = copy->next;
+        if (prev->next != copy) {
+            prev = prev->next;
+        }
+    }
+
+    prev->next = new;
+    new->next = copy;
+
+    return b;
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    b = removeLine(b, 0);
     printBufferWithLines(b);
     return 0;
 }
