@@ -1,3 +1,0 @@
-Ahoj cau,
-Toto je len taky buffer
-no ano
