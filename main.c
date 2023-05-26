@@ -313,9 +313,64 @@ void appendMode(Buffer *b) {
     }
 }
 
+
+void appendModeAtCol(Buffer *b, int col) {
+    Buffer *copy = b;
+    Buffer *end = giveMeLast(b);
+    int stop = 0;
+    int iter = 0;
+    char *meAtEnd = NULL;
+    if (col <= 0) col = 1;
+
+    while (!stop) {
+        char *in = readline();
+
+        if (strlen(in) == 1 && in[0] == '.') {
+            end = giveMeLast(b);
+            char *copy = strdup(end->text);
+            end->text = realloc(end->text, strlen(end->text) + strlen(meAtEnd) + 1);
+            memset(end->text, 0, strlen(end->text) + strlen(meAtEnd) + 1);
+            strcat(end->text, copy);
+            memcpy(end->text + strlen(end->text), meAtEnd, strlen(meAtEnd));
+            end->text[strlen(end->text)] = 0;
+            stop = 1;
+            free(meAtEnd);
+            break;
+        }
+
+        in = modifyInput(in);
+
+        if (!iter) {
+            meAtEnd = strdup(end->text + col);
+            char *old = end->text;
+            end->text = malloc(1);
+            end->text[0] = 0;
+            end->text = realloc(end->text, col + strlen(in) + 1);
+            memset(end->text, 0, col + strlen(in) + 1);
+            memcpy(end->text, old, col);
+            memcpy(end->text + col, in, strlen(in));
+            end->text[strlen(end->text)] = 0;
+            free(old);
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = NULL;
+            end->next = new;
+            end = end->next;
+            iter++;
+        } else {
+            end->text = in;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = NULL;
+            end->next = new;
+            end = end->next;
+            copy->lineCount++;
+        }
+    }
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    appendModeAtLine(b, 1);
     printBufferWithLines(b);
     return 0;
 }
