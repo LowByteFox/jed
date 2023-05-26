@@ -1,8 +1,10 @@
 #ifndef BUFFER_C
 #define BUFFER_C
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef char* string;
 typedef struct {
@@ -35,6 +37,11 @@ Buffer newBuffer() {
     return (Buffer) { .buff = newString(), .buffSize = 1, .lines = malloc(sizeof(int)), .lineCount = 1 };
 }
 
+void clearBuffer(Buffer *b) {
+    free(b->lines);
+    free(b->buff);
+}
+
 void addCharacter(Buffer *b, char character) {
     b->buff[b->buffSize - 1] = character;
     b->buff = realloc(b->buff, b->buffSize + 1);
@@ -61,6 +68,18 @@ Buffer loadFile(char *filename) {
     fclose(f);
 
     return out;
+}
+
+void insertToBuffer(Buffer *buffer, char *filename) {
+    Buffer b = loadFile(filename);
+    for (int i = 0; i < buffer->buffSize; i++) {
+        addCharacter(&b, buffer->buff[i]);
+    }
+    clearBuffer(buffer);
+    buffer->buffSize = b.buffSize;
+    buffer->buff = b.buff;
+    buffer->lineCount = b.lineCount;
+    buffer->lines = b.lines;
 }
 
 void appendToBuffer(Buffer *buffer, char *filename) {
@@ -93,6 +112,8 @@ void insertAtBeginning(Buffer buffer, char *filename) {
     for (int i = 0; i < orig.buffSize - 1; i++) {
         fputc(orig.buff[i], out);
     }
+
+    clearBuffer(&orig);
 
     fclose(out);
 }

@@ -1,6 +1,0 @@
-tempo              526/udp      # newdate 
-0
-2
-2
-#                  10/tcp       Unassigned 
-0
