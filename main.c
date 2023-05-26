@@ -118,6 +118,16 @@ Buffer *insertAfter(Buffer *b, int line) {
     return b;
 }
 
+int wipeLine(Buffer *b, int line) {
+    if (b->lineCount < line) return 1;
+    if (line <= 0) return 2;
+    Buffer *copy = b;
+    for (int i = 1; i < line; i++) copy = copy->next;
+    copy->text = malloc(0);
+    copy->text[0] = 0;
+    return 0;
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
     printBufferWithLines(b);
