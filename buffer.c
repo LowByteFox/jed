@@ -63,6 +63,16 @@ Buffer loadFile(char *filename) {
     return out;
 }
 
+void appendToBuffer(Buffer *buffer, char *filename) {
+    FILE *f = fopen(filename, "r");
+    char tmp;
+    while ((tmp = getc(f)) != EOF) {
+        addCharacter(buffer, tmp);
+    }
+
+    fclose(f);
+}
+
 void appendToFile(Buffer buffer, char *filename) {
     FILE *a = fopen(filename, "a");
     for (int i = 0; i < buffer.buffSize - 1; i++) {
