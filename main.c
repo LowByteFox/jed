@@ -42,9 +42,30 @@ int printLine(Buffer *b, int line) {
     return 0;
 }
 
+Buffer *removeLine(Buffer *b, int line) {
+    if (b->lineCount < line) return b;
+    if (line <= 0) return b;
+    b->lineCount--;
+    if (line == 1) return b->next;
+
+    Buffer *copy = b;
+    Buffer *prev = b;
+
+    for (int i = 1; i < line; i++) {
+        copy = copy->next;
+        if (prev->next != copy) {
+            prev = prev->next;
+        }
+    }
+
+    prev->next = copy->next;
+
+    return b;
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    b = insertFileToBuffer(b, argv[2]);
+    b = removeLine(b, 0);
     printBufferWithLines(b);
     return 0;
 }
