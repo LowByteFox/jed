@@ -98,4 +98,23 @@ void insertBufferToFile(Buffer *b, char *name) {
     appendBufferToFile(file, name);
 }
 
+void appendFileToBuffer(Buffer *b, char *name) {
+    Buffer *copy = giveMeEnd(b);
+    Buffer *file = loadFile(name);
+    Buffer *fileCopy = file;
+    b->lineCount += file->lineCount;
+
+    while(fileCopy->next) {
+        Buffer *new = malloc(sizeof(Buffer));
+        new->text = NULL;
+        new->next = NULL;
+
+        copy->text = fileCopy->text;
+        copy->next = new;
+        copy = copy->next;
+
+        fileCopy = fileCopy->next;
+    }
+}
+
 #endif
