@@ -203,6 +203,79 @@ void findAndReplaceGlobal(Buffer *b, char *target, char *replacement) {
     }
 }
 
+char *modifyInput(char *in) {
+    if (strlen(in) == 2 && !strncmp(in, "\\.", 2)) {
+        in = realloc(in, strlen(in));
+        in[0] = '.';
+        in[1] = 0;
+    } else {
+        if (!strncmp(in, "\\\\.", 3)) {
+            memcpy(in, "\\.", 2);
+            memcpy(in + 2, in + 3, strlen(in) - 3);
+            in[strlen(in)-1] = 0;
+        } else if (!strncmp(in, "\\.", 2)) {
+            in[0] = '.';
+            memcpy(in + 1, in + 2, strlen(in) - 2);
+            in[strlen(in)-1] = 0;
+        }
+    }
+
+    return in;
+}
+
+void appendModeAtLine(Buffer *b, int line) {
+    Buffer *start = b;
+    if (b->lineCount < line) return;
+    if (line <= 0) return;
+
+    Buffer *copy = b;
+
+    for (int i = 1; i < line; i++) {
+        start = start->next;
+    }
+
+    int stop = 0;
+    int iter = 0;
+
+    while (!stop) {
+        char *in = readline();
+        if (strlen(in) == 1 && in[0] == '.') {
+            stop = 1;
+            break;
+        }
+
+        in = modifyInput(in);
+
+        if (!iter) {
+            start->text = realloc(start->text, strlen(start->text) + strlen(in) + 1);
+            memcpy(start->text + strlen(start->text), in, strlen(in));
+            start->text[strlen(start->text)] = 0;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = start->next;
+            start->next = new;
+            start = start->next;
+            iter++;
+        } else {
+            start->text = in;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = start->next;
+            start->next = new;
+            start = start->next;
+            copy->lineCount++;
+        }
+    }
+
+    // fix the null
+    for (int i = 0; i < b->lineCount; i++) {
+        if (copy->next->text == NULL) {
+            copy->next = copy->next->next;
+        }
+        copy = copy->next;
+    }
+}
+
 void appendMode(Buffer *b) {
     Buffer *copy = b;
     Buffer *end = giveMeLast(b);
@@ -216,21 +289,7 @@ void appendMode(Buffer *b) {
             break;
         }
 
-        if (strlen(in) == 2 && !strncmp(in, "\\.", 2)) {
-            in = realloc(in, strlen(in));
-            in[0] = '.';
-            in[1] = 0;
-        } else {
-            if (!strncmp(in, "\\\\.", 3)) {
-                memcpy(in, "\\.", 2);
-                memcpy(in + 2, in + 3, strlen(in) - 3);
-                in[strlen(in)-1] = 0;
-            } else if (!strncmp(in, "\\.", 2)) {
-                in[0] = '.';
-                memcpy(in + 1, in + 2, strlen(in) - 2);
-                in[strlen(in)-1] = 0;
-            }
-        }
+        in = modifyInput(in);
 
         if (!iter) {
             end->text = realloc(end->text, strlen(end->text) + strlen(in) + 1);
@@ -249,13 +308,14 @@ void appendMode(Buffer *b) {
             new->next = NULL;
             end->next = new;
             end = end->next;
+            copy->lineCount++;
         }
     }
 }
 
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    appendMode(b);
+    appendModeAtLine(b, 1);
     printBufferWithLines(b);
     return 0;
 }
