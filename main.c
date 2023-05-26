@@ -203,9 +203,59 @@ void findAndReplaceGlobal(Buffer *b, char *target, char *replacement) {
     }
 }
 
+void appendMode(Buffer *b) {
+    Buffer *copy = b;
+    Buffer *end = giveMeLast(b);
+    int stop = 0;
+    int iter = 0;
+
+    while (!stop) {
+        char *in = readline();
+        if (strlen(in) == 1 && in[0] == '.') {
+            stop = 1;
+            break;
+        }
+
+        if (strlen(in) == 2 && !strncmp(in, "\\.", 2)) {
+            in = realloc(in, strlen(in));
+            in[0] = '.';
+            in[1] = 0;
+        } else {
+            if (!strncmp(in, "\\\\.", 3)) {
+                memcpy(in, "\\.", 2);
+                memcpy(in + 2, in + 3, strlen(in) - 3);
+                in[strlen(in)-1] = 0;
+            } else if (!strncmp(in, "\\.", 2)) {
+                in[0] = '.';
+                memcpy(in + 1, in + 2, strlen(in) - 2);
+                in[strlen(in)-1] = 0;
+            }
+        }
+
+        if (!iter) {
+            end->text = realloc(end->text, strlen(end->text) + strlen(in) + 1);
+            memcpy(end->text + strlen(end->text), in, strlen(in));
+            end->text[strlen(end->text)] = 0;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = NULL;
+            end->next = new;
+            end = end->next;
+            iter++;
+        } else {
+            end->text = in;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = NULL;
+            end->next = new;
+            end = end->next;
+        }
+    }
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    findAndReplaceGlobal(b, "foo", "bar 2");
+    appendMode(b);
     printBufferWithLines(b);
     return 0;
 }

@@ -83,6 +83,12 @@ Buffer *giveMeEnd(Buffer *b) {
     return copy;
 }
 
+Buffer *giveMeLast(Buffer *b) {
+    Buffer *copy = b;
+    while (copy->next && copy->next->next) copy = copy->next;
+    return copy;
+}
+
 void insertBufferToFile(Buffer *b, char *name) {
     Buffer *file = loadFile(name);
     Buffer *copy = b;

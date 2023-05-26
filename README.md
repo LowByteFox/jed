@@ -31,7 +31,7 @@ By default, you start at the end of current buffer<br>
 To exit append mode, the current line where you type must contain only `.`, if you need it there, simply escape it using `\.`
 
 however, you can use subcommands:
-* `l` -- `i l 1` will start append mode at the start of line 1
+* `l` -- `i l 1` will start append mode at the end of line 1
 * `p` -- `i p 20` will start appending after 20th character
 > Subcommands can be chained together, like `a l 2 p 10` -- this will start append mode at line 2, 10th character
 ## Replace mode
