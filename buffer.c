@@ -58,7 +58,33 @@ Buffer loadFile(char *filename) {
         addCharacter(&out, tmp);
     }
 
+    fclose(f);
+
     return out;
+}
+
+void appendToFile(Buffer buffer, char *filename) {
+    FILE *a = fopen(filename, "a");
+    for (int i = 0; i < buffer.buffSize - 1; i++) {
+        fputc(buffer.buff[i], a);
+    }
+
+    fclose(a);
+}
+
+void insertAtBeginning(Buffer buffer, char *filename) {
+    Buffer orig = loadFile(filename);
+    FILE *out = fopen(filename, "w");
+
+    for (int i = 0; i < buffer.buffSize - 1; i++) {
+        fputc(buffer.buff[i], out);
+    }
+
+    for (int i = 0; i < orig.buffSize - 1; i++) {
+        fputc(orig.buff[i], out);
+    }
+
+    fclose(out);
 }
 
 #endif
