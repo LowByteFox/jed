@@ -128,8 +128,31 @@ int wipeLine(Buffer *b, int line) {
     return 0;
 }
 
+// 1 - found, 0 - not found
+int findAndReplace(Buffer *b, char *target, char *replacement) {
+    Buffer *copy = b;
+    while (b->next) {
+        char *base = strstr(b->text, target);
+        if (base) {
+            char *first = strndup(b->text, base - b->text); // getting length
+            first = realloc(first, strlen(b->text) + 1 +
+                    (strlen(replacement) - strlen(target)));
+            memcpy(first + (base - b->text), replacement, strlen(replacement));
+            strcat(first + (base - b->text) + strlen(replacement),
+                    b->text + (base - b->text) + strlen(target));
+            first[strlen(first)] = 0;
+            free(b->text);
+            b->text = first;
+            return 1;
+        }
+        b = b->next;
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
+    findAndReplace(b, "foo", "bar 2");
     printBufferWithLines(b);
     return 0;
 }

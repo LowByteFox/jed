@@ -1,3 +1,4 @@
 Ahoj cau,
-Toto je len taky testny buffer,
+Toto je len taky testny buffer, foo no ano
 No ano
+foo
