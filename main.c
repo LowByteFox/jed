@@ -7,6 +7,6 @@
 
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    appendBufferToFile(b, argv[1]);
+    insertBufferToFile(b, argv[2]);
     return 0;
 }

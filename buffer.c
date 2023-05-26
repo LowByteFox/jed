@@ -45,6 +45,7 @@ Buffer *loadFile(char *name) {
             len++;
             buff = realloc(buff, len);
         } else {
+            buff[len - 1] = 0;
             buf->text = buff;
             len = 1;
             buff = malloc(1);
@@ -72,5 +73,25 @@ void appendBufferToFile(Buffer *b, char *name) {
     fclose(o);
 }
 
-#endif
+Buffer *giveMeEnd(Buffer *b) {
+    Buffer *copy = b;
+    while (copy->next) copy = copy->next;
+    return copy;
+}
 
+void insertBufferToFile(Buffer *b, char *name) {
+    Buffer *file = loadFile(name);
+    Buffer *copy = b;
+    FILE *o = fopen(name, "w");
+
+    while(copy->next) {
+        fprintf(o, "%s\n", copy->text);
+        copy = copy->next;
+    }
+
+    fclose(o);
+
+    appendBufferToFile(file, name);
+}
+
+#endif
