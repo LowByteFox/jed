@@ -138,10 +138,12 @@ int findAndReplace(Buffer *b, char *target, char *replacement) {
             first = realloc(first, strlen(copy->text) + 1 +
                     (strlen(replacement) - strlen(target)));
             memcpy(first + (base - copy->text), replacement, strlen(replacement));
-            strcat(first + (base - copy->text) + strlen(replacement),
-                    copy->text + (base - copy->text) + strlen(target));
+            char *end = strdup(copy->text + (base - copy->text + strlen(target)));
+            memcpy(first + (base - copy->text + strlen(replacement)),
+                    end, strlen(end));
             first[strlen(first)] = 0;
             free(copy->text);
+            free(end);
             copy->text = first;
             return 1;
         }
@@ -159,17 +161,19 @@ int findAndReplaceLine(Buffer *b, int line, char *target, char *replacement) {
     for (int i = 1; i < line; i++) {
         copy = copy->next;
     }
-
+ 
     char *base = strstr(copy->text, target);
     if (base) {
         char *first = strndup(copy->text, base - copy->text); // getting length
         first = realloc(first, strlen(copy->text) + 1 +
                 (strlen(replacement) - strlen(target)));
         memcpy(first + (base - copy->text), replacement, strlen(replacement));
-        strcat(first + (base - copy->text) + strlen(replacement),
-                copy->text + (base - copy->text) + strlen(target));
+        char *end = strdup(copy->text + (base - copy->text + strlen(target)));
+        memcpy(first + (base - copy->text + strlen(replacement)),
+                end, strlen(end));
         first[strlen(first)] = 0;
         free(copy->text);
+        free(end);
         copy->text = first;
         return 1;
     }
@@ -177,8 +181,31 @@ int findAndReplaceLine(Buffer *b, int line, char *target, char *replacement) {
     return 3;
 }
 
+void findAndReplaceGlobal(Buffer *b, char *target, char *replacement) {
+    Buffer *copy = b;
+    while (copy->next) {
+        char *base = strstr(copy->text, target);
+        while (base) {
+            char *first = strndup(copy->text, base - copy->text); // getting length
+            first = realloc(first, strlen(copy->text) + 1 +
+                    (strlen(replacement) - strlen(target)));
+            memcpy(first + (base - copy->text), replacement, strlen(replacement));
+            char *end = strdup(copy->text + (base - copy->text + strlen(target)));
+            memcpy(first + (base - copy->text + strlen(replacement)),
+                    end, strlen(end));
+            first[strlen(first)] = 0;
+            free(copy->text);
+            free(end);
+            copy->text = first;
+            base = strstr(copy->text, target);
+        }
+        copy = copy->next;
+    }
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
+    findAndReplaceGlobal(b, "foo", "bar 2");
     printBufferWithLines(b);
     return 0;
 }
