@@ -44,5 +44,7 @@ int printLine(Buffer *b, int line) {
 
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
+    b = insertFileToBuffer(b, argv[2]);
+    printBufferWithLines(b);
     return 0;
 }
