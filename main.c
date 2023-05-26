@@ -131,28 +131,54 @@ int wipeLine(Buffer *b, int line) {
 // 1 - found, 0 - not found
 int findAndReplace(Buffer *b, char *target, char *replacement) {
     Buffer *copy = b;
-    while (b->next) {
-        char *base = strstr(b->text, target);
+    while (copy->next) {
+        char *base = strstr(copy->text, target);
         if (base) {
-            char *first = strndup(b->text, base - b->text); // getting length
-            first = realloc(first, strlen(b->text) + 1 +
+            char *first = strndup(copy->text, base - copy->text); // getting length
+            first = realloc(first, strlen(copy->text) + 1 +
                     (strlen(replacement) - strlen(target)));
-            memcpy(first + (base - b->text), replacement, strlen(replacement));
-            strcat(first + (base - b->text) + strlen(replacement),
-                    b->text + (base - b->text) + strlen(target));
+            memcpy(first + (base - copy->text), replacement, strlen(replacement));
+            strcat(first + (base - copy->text) + strlen(replacement),
+                    copy->text + (base - copy->text) + strlen(target));
             first[strlen(first)] = 0;
-            free(b->text);
-            b->text = first;
+            free(copy->text);
+            copy->text = first;
             return 1;
         }
-        b = b->next;
+        copy = copy->next;
     }
     return 0;
 }
 
+// 0 - found
+int findAndReplaceLine(Buffer *b, int line, char *target, char *replacement) {
+    if (b->lineCount < line) return 1;
+    if (line <= 0) return 2;
+    Buffer *copy = b;
+
+    for (int i = 1; i < line; i++) {
+        copy = copy->next;
+    }
+
+    char *base = strstr(copy->text, target);
+    if (base) {
+        char *first = strndup(copy->text, base - copy->text); // getting length
+        first = realloc(first, strlen(copy->text) + 1 +
+                (strlen(replacement) - strlen(target)));
+        memcpy(first + (base - copy->text), replacement, strlen(replacement));
+        strcat(first + (base - copy->text) + strlen(replacement),
+                copy->text + (base - copy->text) + strlen(target));
+        first[strlen(first)] = 0;
+        free(copy->text);
+        copy->text = first;
+        return 1;
+    }
+
+    return 3;
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
-    findAndReplace(b, "foo", "bar 2");
     printBufferWithLines(b);
     return 0;
 }
