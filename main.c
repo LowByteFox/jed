@@ -31,8 +31,21 @@ void printBufferWithLines(Buffer b) {
     }
 }
 
+int printLine(Buffer b, int line) {
+    if (b.lineCount < line) return 1;
+
+    if (line <= 0) return 2;
+
+    int start = b.lines[line - 1];
+    int end = b.lines[line];
+    char *str = strndup(b.buff + start, end - start - 1);
+    printf("%s\n", str);
+    free(str);
+
+    return 0;
+}
+
 int main(int argc, char **argv) {
     Buffer b = loadFile(argv[1]);
-    printBufferWithLines(b);
     return 0;
 }
