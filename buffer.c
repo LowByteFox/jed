@@ -57,6 +57,7 @@ Buffer *loadFile(char *name) {
             count++;
         }
     }
+    free(buff);
 
     buf->next = NULL;
     buf->text = NULL;

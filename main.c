@@ -320,6 +320,7 @@ void appendModeAtCol(Buffer *b, int col) {
     int stop = 0;
     int iter = 0;
     char *meAtEnd = NULL;
+    Buffer *prev = b;
     if (col <= 0) col = 1;
 
     while (!stop) {
@@ -333,6 +334,7 @@ void appendModeAtCol(Buffer *b, int col) {
             strcat(end->text, copy);
             memcpy(end->text + strlen(end->text), meAtEnd, strlen(meAtEnd));
             end->text[strlen(end->text)] = 0;
+            free(copy);
             stop = 1;
             free(meAtEnd);
             break;
@@ -369,8 +371,85 @@ void appendModeAtCol(Buffer *b, int col) {
     }
 }
 
+void appendModeAtLineAtCol(Buffer *b, int line, int col) {
+    Buffer *start = b;
+    char *meAtEnd = NULL;
+    Buffer *prev = b;
+    if (b->lineCount < line) return;
+    if (line <= 0) return;
+
+    Buffer *copy = b;
+
+    for (int i = 1; i < line; i++) {
+        start = start->next;
+    }
+
+    int stop = 0;
+    int iter = 0;
+
+    if (col <= 0) col = 1;
+
+    while (!stop) {
+        char *in = readline();
+        if (strlen(in) == 1 && in[0] == '.') {
+            start = prev;
+            char *copy = strdup(start->text);
+            start->text = realloc(start->text, strlen(start->text) + strlen(meAtEnd) + 1);
+            memset(start->text, 0, strlen(start->text) + strlen(meAtEnd) + 1);
+            strcat(start->text, copy);
+            memcpy(start->text + strlen(start->text), meAtEnd, strlen(meAtEnd));
+            start->text[strlen(start->text)] = 0;
+            free(copy);
+            stop = 1;
+            free(meAtEnd);
+            break;
+        }
+
+        in = modifyInput(in);
+
+        if (!iter) {
+            meAtEnd = strdup(start->text + col);
+            char *old = start->text;
+            start->text = malloc(1);
+            start->text[0] = 0;
+            start->text = realloc(start->text, col + strlen(in) + 1);
+            memset(start->text, 0, col + strlen(in) + 1);
+            memcpy(start->text, old, col);
+            memcpy(start->text + col, in, strlen(in));
+            start->text[strlen(start->text)] = 0;
+            free(old);
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = start->next;
+            start->next = new;
+            start = start->next;
+            iter++;
+        } else {
+            start->text = in;
+            Buffer *new = malloc(sizeof(Buffer));
+            new->text = NULL;
+            new->next = start->next;
+            start->next = new;
+            start = start->next;
+            copy->lineCount++;
+            if (prev->next != copy) {
+                prev = prev->next;
+            }
+        }
+    }
+
+    // fix the null
+    for (int i = 0; i < b->lineCount; i++) {
+        if (copy->next->text == NULL) {
+            copy->next = copy->next->next;
+        }
+        copy = copy->next;
+    }
+}
+
 int main(int argc, char **argv) {
     Buffer *b = loadFile(argv[1]);
+    appendModeAtLineAtCol(b, 1, 4);
     printBufferWithLines(b);
     return 0;
 }
